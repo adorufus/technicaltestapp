@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:technicaltest/core/di/inject.dart';
 import 'package:technicaltest/core/routes/app_routes.dart';
 import 'package:technicaltest/core/services/firebase/firebase_service.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // FirebaseService.init();
+  FirebaseService.init();
+
+  await initService();
 
   runApp(const MainApp());
 }
