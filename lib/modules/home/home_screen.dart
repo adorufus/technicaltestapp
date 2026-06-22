@@ -75,7 +75,7 @@ class HomeScreen extends GetView<HomeController> {
                             data.status.label == "On Progress",
                       )
                       .isEmpty) {
-                    return const Center(child: Text("Tidak ada data"));
+                    return const Center(child: Text("No data available"));
                   }
 
                   return taskListWidget(
@@ -115,8 +115,8 @@ class HomeScreen extends GetView<HomeController> {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  if (controller.streamedTaskList.isEmpty) {
-                    return const Center(child: Text("Tidak ada data"));
+                  if (controller.streamedTaskList.where((task) => task.status == TaskStatus.done).isEmpty) {
+                    return const Center(child: Text("No data available"));
                   }
 
                   return taskListWidget(
@@ -155,8 +155,8 @@ class HomeScreen extends GetView<HomeController> {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  if (controller.streamedTaskList.isEmpty) {
-                    return const Center(child: Text("Tidak ada data"));
+                  if (controller.streamedTaskList.where((task) => task.status == TaskStatus.pending).isEmpty) {
+                    return const Center(child: Text("No data available"));
                   }
 
                   return taskListWidget(

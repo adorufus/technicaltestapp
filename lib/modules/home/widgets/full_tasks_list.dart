@@ -19,7 +19,7 @@ class FullTasksList extends GetView<HomeController> {
               return const Center(child: CircularProgressIndicator());
             }
 
-            if (controller.streamedTaskList.isEmpty) {
+            if (controller.streamedTaskList.where((data) => data.status == Get.arguments['status']).isEmpty) {
               return const Center(child: Text("Tidak ada data"));
             }
 

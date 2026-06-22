@@ -7,7 +7,7 @@ import 'package:technicaltest/core/services/firebase/firebase_service.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  FirebaseService.init();
+  await FirebaseService.init();
 
   await initDeps();
 
