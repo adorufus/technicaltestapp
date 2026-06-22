@@ -40,6 +40,59 @@ class HomeScreen extends GetView<HomeController> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Obx(
+                () => Text(
+                  "You have ${controller.streamedTaskList.where((data) => data.status == TaskStatus.onprogress).length} ongoing task to complete",
+                  style: TextStyle(fontSize: 14),
+                ),
+              ),
+              SizedBox(height: 20,),
+              Container(
+                width: MediaQuery.of(context).size.width,
+                height: 150,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: Colors.blueAccent
+                ),
+                padding: EdgeInsets.all(30),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text("TODAY'S PROGRESS", style: TextStyle(
+                            color: Colors.white.withAlpha(200),
+                            fontWeight: FontWeight.bold
+                          ),),
+                          Obx(
+                            () => Text("${controller.taskProgressPercentage.toStringAsFixed(0)}% Completed", style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 20
+                            ),),
+                          )
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 60,
+                      width: 60,
+                      child: Obx(
+                        () => CircularProgressIndicator(
+                          backgroundColor: Colors.white,
+                          value: controller.taskProgressPercentage / 100,
+                          valueColor: AlwaysStoppedAnimation(Colors.red),
+                          strokeWidth: 10,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              SizedBox(height: 20,),
               Row(
                 children: [
                   Text(
@@ -49,9 +102,10 @@ class HomeScreen extends GetView<HomeController> {
                   Expanded(child: SizedBox()),
                   GestureDetector(
                     onTap: () {
-                      Get.toNamed(AppRoutes.fullTaskList, arguments: {
-                        "status": TaskStatus.onprogress
-                      });
+                      Get.toNamed(
+                        AppRoutes.fullTaskList,
+                        arguments: {"status": TaskStatus.onprogress},
+                      );
                     },
                     child: Text(
                       "See All",
@@ -96,9 +150,10 @@ class HomeScreen extends GetView<HomeController> {
                   Expanded(child: SizedBox()),
                   GestureDetector(
                     onTap: () {
-                      Get.toNamed(AppRoutes.fullTaskList, arguments: {
-                        "status": TaskStatus.done
-                      });
+                      Get.toNamed(
+                        AppRoutes.fullTaskList,
+                        arguments: {"status": TaskStatus.done},
+                      );
                     },
                     child: Text(
                       "See All",
@@ -115,7 +170,9 @@ class HomeScreen extends GetView<HomeController> {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  if (controller.streamedTaskList.where((task) => task.status == TaskStatus.done).isEmpty) {
+                  if (controller.streamedTaskList
+                      .where((task) => task.status == TaskStatus.done)
+                      .isEmpty) {
                     return const Center(child: Text("No data available"));
                   }
 
@@ -123,7 +180,7 @@ class HomeScreen extends GetView<HomeController> {
                     context,
                     controller,
                     isFiltereByStatus: true,
-                    status: TaskStatus.done
+                    status: TaskStatus.done,
                   );
                 }),
               ),
@@ -136,9 +193,10 @@ class HomeScreen extends GetView<HomeController> {
                   Expanded(child: SizedBox()),
                   GestureDetector(
                     onTap: () {
-                      Get.toNamed(AppRoutes.fullTaskList, arguments: {
-                        "status": TaskStatus.pending
-                      });
+                      Get.toNamed(
+                        AppRoutes.fullTaskList,
+                        arguments: {"status": TaskStatus.pending},
+                      );
                     },
                     child: Text(
                       "See All",
@@ -155,7 +213,9 @@ class HomeScreen extends GetView<HomeController> {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  if (controller.streamedTaskList.where((task) => task.status == TaskStatus.pending).isEmpty) {
+                  if (controller.streamedTaskList
+                      .where((task) => task.status == TaskStatus.pending)
+                      .isEmpty) {
                     return const Center(child: Text("No data available"));
                   }
 
@@ -163,7 +223,7 @@ class HomeScreen extends GetView<HomeController> {
                     context,
                     controller,
                     isFiltereByStatus: true,
-                    status: TaskStatus.pending                   
+                    status: TaskStatus.pending,
                   );
                 }),
               ),

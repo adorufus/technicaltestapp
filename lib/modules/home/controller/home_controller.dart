@@ -4,7 +4,6 @@ import 'package:technicaltest/core/models/task_data_model.dart';
 import 'package:technicaltest/core/repository/task_repository.dart';
 
 class HomeController extends GetxController {
-
   final TaskRepository taskRepository = Get.find<TaskRepository>();
 
   TextEditingController taskTitleController = TextEditingController();
@@ -50,6 +49,29 @@ class HomeController extends GetxController {
     });
   }
 
+  double get taskProgressPercentage {
+    //calculate percentage
+
+    var totalTask = streamedTaskList.length;
+
+    if (totalTask == 0) return 0.0;
+
+    var finishedTask = streamedTaskList
+        .where((task) => task.status == TaskStatus.done)
+        .length;
+
+    var ongoingAndPendingTask = totalTask - finishedTask;
+
+    
+
+    double calulateTask =
+        (finishedTask / totalTask) * 100;
+
+        print(calulateTask);
+
+    return calulateTask;
+  }
+
   bool validateInput(String? input) {
     if (input != null || input!.isNotEmpty) {
       return true;
@@ -66,7 +88,12 @@ class HomeController extends GetxController {
       //   "status": TaskStatus.pending,
       // });
 
-      final newTask = TaskModel(id: '', title: taskTitleController.text, notes: taskNotesController.text, status: selectedStatus.value);
+      final newTask = TaskModel(
+        id: '',
+        title: taskTitleController.text,
+        notes: taskNotesController.text,
+        status: selectedStatus.value,
+      );
 
       taskRepository.addTask(newTask);
 
@@ -80,7 +107,7 @@ class HomeController extends GetxController {
     final updatedTask = currentTaskData.copyWith(
       title: taskTitleController.text,
       notes: taskNotesController.text,
-      status: selectedStatus.value
+      status: selectedStatus.value,
     );
 
     taskRepository.updateTask(updatedTask);
