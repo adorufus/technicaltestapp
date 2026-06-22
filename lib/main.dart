@@ -9,7 +9,7 @@ Future<void> main() async {
 
   FirebaseService.init();
 
-  await initService();
+  await initDeps();
 
   runApp(const MainApp());
 }

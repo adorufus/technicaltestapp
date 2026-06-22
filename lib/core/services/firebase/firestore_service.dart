@@ -1,7 +1,6 @@
-
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import 'package:technicaltest/core/models/abstracts/firestore_model_abstract.dart';
 
 class FirestoreService extends GetxService {
   late FirebaseFirestore firestore;
@@ -11,20 +10,70 @@ class FirestoreService extends GetxService {
     return this;
   }
 
-  Future<void> addData(String collection, Map<String, dynamic> data) async {
-    await firestore.collection(collection).add(data);
+  CollectionReference<T> _getRef<T extends FirestoreModel>({
+    required String collection,
+    required T Function(
+      DocumentSnapshot<Map<String, dynamic>>,
+      SnapshotOptions?,
+    )
+    fromFirestore,
+  }) {
+    return firestore
+        .collection(collection)
+        .withConverter(
+          fromFirestore: fromFirestore,
+          toFirestore: (model, _) => model.toFirestore(),
+        );
   }
 
-  Future<QuerySnapshot> getData(String collection) async {
-    return await firestore.collection(collection).get();
+  Future<void> addData<T extends FirestoreModel>(
+    String collection,
+    T data,
+  ) async {
+    await firestore.collection(collection).add(data.toFirestore());
   }
 
-  Future<void> updateData(String collection, String docId, Map<String, dynamic> data) async {
-    await firestore.collection(collection).doc(docId).update(data);
+  Future<List<T>> getData<T extends FirestoreModel>({
+    required String collection,
+    required T Function(
+      DocumentSnapshot<Map<String, dynamic>>,
+      SnapshotOptions?,
+    )
+    fromFirestore,
+  }) async {
+    final ref = _getRef<T>(
+      collection: collection,
+      fromFirestore: fromFirestore,
+    );
+    final querySnapshot = await ref.get();
+    return querySnapshot.docs.map((doc) => doc.data()).toList();
   }
 
-  Stream<QuerySnapshot> streamData(String collection) {
-    return firestore.collection(collection).snapshots();
+  Future<void> updateData<T extends FirestoreModel>({
+    required String collection,
+    required T data,
+  }) async {
+    await firestore
+        .collection(collection)
+        .doc(data.id)
+        .update(data.toFirestore());
   }
 
+  Stream<List<T>> streamData<T extends FirestoreModel>({
+    required String collection,
+    required T Function(
+      DocumentSnapshot<Map<String, dynamic>>,
+      SnapshotOptions?,
+    )
+    fromFirestore,
+  }) {
+    final ref = _getRef(collection: collection, fromFirestore: fromFirestore);
+    return ref.snapshots().map(
+      (querySnapshot) => querySnapshot.docs.map((doc) => doc.data()).toList(),
+    );
+  }
+
+  Future<void> deleteData(String collection, String docId) async {
+    await firestore.collection(collection).doc(docId).delete();
+  }
 }

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:technicaltest/core/models/task_data_model.dart';
+import 'package:technicaltest/core/routes/app_routes.dart';
 import 'package:technicaltest/modules/home/controller/home_controller.dart';
 import 'package:technicaltest/modules/home/widgets/bottomsheets.dart';
+import 'package:technicaltest/modules/home/widgets/task_list_widget.dart';
 
 class HomeScreen extends GetView<HomeController> {
   const HomeScreen({super.key});
@@ -14,13 +17,19 @@ class HomeScreen extends GetView<HomeController> {
         title: Text("Task Tracker App"),
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.amber,
+        child: Icon(
+          Icons.add,
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
         onPressed: () {
           showModalBottomSheet(
             context: context,
             isScrollControlled: false,
             showDragHandle: true,
             builder: (currentContext) {
-              return bottomsheet(context, currentContext);
+              return bottomsheet(context, currentContext, isEdit: false);
             },
           );
         },
@@ -31,31 +40,19 @@ class HomeScreen extends GetView<HomeController> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                "Task Due Today",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 20),
-              Container(
-                height: 150,
-                margin: EdgeInsets.all(16),
-                width: MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(
-                  color: Colors.red,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Text("test"),
-              ),
-              SizedBox(height: 20),
               Row(
                 children: [
                   Text(
-                    "List of tasks",
+                    "Ongoing Tasks",
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   Expanded(child: SizedBox()),
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      Get.toNamed(AppRoutes.fullTaskList, arguments: {
+                        "status": TaskStatus.onprogress
+                      });
+                    },
                     child: Text(
                       "See All",
                       style: TextStyle(color: Colors.blue),
@@ -66,50 +63,109 @@ class HomeScreen extends GetView<HomeController> {
               SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Obx(
-                  () => Column(
-                    children: controller.mockTaskData.reversed.take(5).map((
-                      data,
-                    ) {
-                      return Container(
-                        margin: EdgeInsets.only(bottom: 12),
-                        padding: EdgeInsets.all(10),
-                        width: MediaQuery.of(context).size.width,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color:
-                              controller.convertStatusEnumToString(
-                                    data["status"],
-                                  ) ==
-                                  "Pending"
-                              ? Colors.grey
-                              : controller.convertStatusEnumToString(
-                                      data["status"],
-                                    ) ==
-                                    "Done"
-                              ? Colors.green
-                              : Colors.blue,
-                          borderRadius: BorderRadius.circular(7),
-                        ),
-                        child: Row(
-                          children: [
-                            Text(
-                              data["title"] ?? "Unknown Task",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            Expanded(child: SizedBox()),
-                            Text(
-                              controller.convertStatusEnumToString(
-                                data["status"],
-                              ),
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
+                child: Obx(() {
+                  if (controller.isLoading.value) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (controller.streamedTaskList
+                      .where(
+                        (data) =>
+                            data.status.label == "onprogress" ||
+                            data.status.label == "On Progress",
+                      )
+                      .isEmpty) {
+                    return const Center(child: Text("Tidak ada data"));
+                  }
+
+                  return taskListWidget(
+                    context,
+                    controller,
+                    isFiltereByStatus: true,
+                    status: TaskStatus.onprogress,
+                  );
+                }),
+              ),
+              SizedBox(height: 20),
+              Row(
+                children: [
+                  Text(
+                    "Finished Tasks",
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                ),
+                  Expanded(child: SizedBox()),
+                  GestureDetector(
+                    onTap: () {
+                      Get.toNamed(AppRoutes.fullTaskList, arguments: {
+                        "status": TaskStatus.done
+                      });
+                    },
+                    child: Text(
+                      "See All",
+                      style: TextStyle(color: Colors.blue),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Obx(() {
+                  if (controller.isLoading.value) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (controller.streamedTaskList.isEmpty) {
+                    return const Center(child: Text("Tidak ada data"));
+                  }
+
+                  return taskListWidget(
+                    context,
+                    controller,
+                    isFiltereByStatus: true,
+                    status: TaskStatus.done
+                  );
+                }),
+              ),
+              Row(
+                children: [
+                  Text(
+                    "Pending Tasks",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  Expanded(child: SizedBox()),
+                  GestureDetector(
+                    onTap: () {
+                      Get.toNamed(AppRoutes.fullTaskList, arguments: {
+                        "status": TaskStatus.pending
+                      });
+                    },
+                    child: Text(
+                      "See All",
+                      style: TextStyle(color: Colors.blue),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Obx(() {
+                  if (controller.isLoading.value) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (controller.streamedTaskList.isEmpty) {
+                    return const Center(child: Text("Tidak ada data"));
+                  }
+
+                  return taskListWidget(
+                    context,
+                    controller,
+                    isFiltereByStatus: true,
+                    status: TaskStatus.pending                   
+                  );
+                }),
               ),
             ],
           ),
