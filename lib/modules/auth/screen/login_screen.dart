@@ -16,6 +16,7 @@ class LoginScreen extends GetView<LoginController> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Text("Task Tracker App", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),),
             ElevatedButton(
               style: ButtonStyle(
                 backgroundColor: WidgetStateColor.resolveWith(

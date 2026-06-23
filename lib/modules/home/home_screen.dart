@@ -40,6 +40,7 @@ class HomeScreen extends GetView<HomeController> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Obx(() => Text("Hello, ${controller.userName}")),
               Obx(
                 () => Text(
                   "You have ${controller.streamedTaskList.where((data) => data.status == TaskStatus.onprogress).length} ongoing task to complete",

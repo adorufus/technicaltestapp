@@ -1,10 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:technicaltest/core/models/task_data_model.dart';
 import 'package:technicaltest/core/repository/task_repository.dart';
+import 'package:technicaltest/core/services/firebase/auth_service.dart';
 
 class HomeController extends GetxController {
   final TaskRepository taskRepository = Get.find<TaskRepository>();
+  final AuthService authService = Get.find<AuthService>();
 
   TextEditingController taskTitleController = TextEditingController();
   TextEditingController taskNotesController = TextEditingController();
@@ -14,16 +17,22 @@ class HomeController extends GetxController {
     {"title": "Task 2", "notes": "notes 2", "status": TaskStatus.done},
   ].obs;
 
+  RxString userName = "".obs;
+
   RxList<TaskModel> realTaskData = RxList.empty();
   Rx<TaskStatus> selectedStatus = Rx(TaskStatus.pending);
+
   var streamedTaskList = <TaskModel>[].obs;
   var isLoading = true.obs;
-
   var currentTaskStatusPage = TaskStatus.pending;
+
+  String? currentUserId;
 
   @override
   void onInit() async {
     super.onInit();
+
+    listenToAuthStateChanges();
 
     await getTaskData();
     streamTaskData();
@@ -33,6 +42,14 @@ class HomeController extends GetxController {
   void dispose() {
     // TODO: implement dispose
     super.dispose();
+  }
+
+  void listenToAuthStateChanges() {
+    authService.authInstance.authStateChanges().listen((data){
+      userName.value = data?.displayName ?? "";
+
+      print("display name: ${data?.displayName}");
+    }); 
   }
 
   void streamTaskData() {
@@ -62,12 +79,9 @@ class HomeController extends GetxController {
 
     var ongoingAndPendingTask = totalTask - finishedTask;
 
-    
+    double calulateTask = (finishedTask / totalTask) * 100;
 
-    double calulateTask =
-        (finishedTask / totalTask) * 100;
-
-        print(calulateTask);
+    print(calulateTask);
 
     return calulateTask;
   }
